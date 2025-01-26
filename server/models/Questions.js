@@ -56,7 +56,7 @@ const questionSchema = new mongoose.Schema({
     type: [
       {
         text: String,
-        isCorrect: Boolean,
+        isCorrectAnswer: Boolean,
       },
     ],
     required: function () {

@@ -31,5 +31,5 @@ message Block {
 
 message Option {
   string text = 1;
-  bool isCorrect = 2;
+  bool isCorrectAnswer = 2;
 }

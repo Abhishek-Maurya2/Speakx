@@ -1,7 +1,6 @@
 // Add this at the very top of your index.js
 process.env.NODE_NO_WARNINGS = "1";
 
-
 const express = require("express");
 const connectDB = require("./db");
 const questionsRoute = require("./routes/questions");
