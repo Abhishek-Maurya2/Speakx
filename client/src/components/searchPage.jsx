@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import { ArrowRight } from "lucide-react";
 
-const baseURL = "http://localhost:5000/questions";
+const baseURL = import.meta.env.VITE_API_URL;
 const search = async (data) => {
   try {
     const response = await axios.post(`${baseURL}/search/`, { ...data });
@@ -14,7 +14,7 @@ const search = async (data) => {
 
 function SearchPage() {
   const [parameters, setParameters] = useState({
-    question: "",
+    title: "",
     type: "",
     anagramType: "",
   });
@@ -58,9 +58,9 @@ function SearchPage() {
             type="text"
             placeholder="Search"
             onChange={(e) =>
-              setParameters({ ...parameters, question: e.target.value })
+              setParameters({ ...parameters, title: e.target.value })
             }
-            value={parameters.question}
+            value={parameters.title}
             className="px-2 py-4 outline-none focus:outline-none min-w-[300px] w-[40vw] bg-white"
           />
           <button

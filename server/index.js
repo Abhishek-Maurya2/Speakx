@@ -1,11 +1,12 @@
+// Add this at the very top of your index.js
+process.env.NODE_NO_WARNINGS = "1";
+
+
 const express = require("express");
 const connectDB = require("./db");
 const questionsRoute = require("./routes/questions");
 const cors = require("cors");
-const grpc = require("@grpc/grpc-js");
-const protoLoader = require("@grpc/proto-loader");
-const path = require("path");
-const { getQuestionsGrpc } = require("./controllers/questionsController");
+const { startGrpcServer } = require("./grpc_server.js"); // Modified import
 
 // Database connection
 connectDB();
@@ -28,36 +29,17 @@ app.use((req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-// Start Express server
-app.listen(5000, () => {
-  console.log("REST server running on port 5000 🚀🚀");
+// Start servers
+const PORT = 5000;
+app.listen(PORT, async () => {
+  console.log("REST server running on port 5000 🚀");
+
+  // Start gRPC server after REST server is running
+  try {
+    await startGrpcServer();
+    console.log("gRPC server running on port 50051 🚀");
+  } catch (err) {
+    console.error("Failed to start gRPC server:", err);
+    process.exit(1);
+  }
 });
-
-// gRPC Server Setup
-const packageDefinition = protoLoader.loadSync(
-  path.join(__dirname, "questions.proto")
-);
-const questionsProto = grpc.loadPackageDefinition(packageDefinition).questions;
-
-function main() {
-  const grpcServer = new grpc.Server();
-
-  grpcServer.addService(questionsProto.QuestionsService.service, {
-    getQuestions: getQuestionsGrpc,
-  });
-
-  grpcServer.bindAsync(
-    "0.0.0.0:50051",
-    grpc.ServerCredentials.createInsecure(),
-    (err) => {
-      if (err) {
-        console.error("gRPC server failed to bind:", err);
-        return;
-      }
-      console.log("gRPC server running on port 50051 🚀🚀");
-      grpcServer.start();
-    }
-  );
-}
-
-main();

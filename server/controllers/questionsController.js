@@ -3,7 +3,7 @@ const protoLoader = require("@grpc/proto-loader");
 const path = require("path");
 const Question = require("../models/Questions");
 
-// gRPC Client Setup
+// gRPC setup
 const packageDefinition = protoLoader.loadSync(
   path.join(__dirname, "../questions.proto")
 );
@@ -13,13 +13,21 @@ const client = new questionsProto.QuestionsService(
   "localhost:50051",
   grpc.credentials.createInsecure(),
   {
-    "grpc.max_receive_message_length": 1024 * 1024 * 10, // 10MB
-    "grpc.max_send_message_length": 1024 * 1024 * 10, // 10MB
+    "grpc.max_receive_message_length": 1024 * 1024 * 50,
+    "grpc.max_send_message_length": 1024 * 1024 * 50,
   }
 );
 
-// REST Controller (acts as gRPC client)
+// REST Controller
+var recived = {};
+
 function getQuestions(req, res) {
+  recived = {
+    title: req.body.title || "",
+    type: req.body.type || "",
+    anagramType: req.body.anagramType || "",
+  };
+
   client.getQuestions({}, (err, response) => {
     if (err) {
       console.error("gRPC Error:", err);
@@ -32,13 +40,26 @@ function getQuestions(req, res) {
 // gRPC Server Implementation
 async function getQuestionsGrpc(call, callback) {
   try {
-    const questions = await Question.find().lean();
+    const { title, type, anagramType } = recived;
+    const query = {};
+    if (title) {
+      query.title = { $regex: title, $options: "i" };
+    }
+    if (type) {
+      query.type = type;
+    }
+    if (anagramType) {
+      query.anagramType = anagramType;
+    }
+    console.log("Query:", query);
+
+    const questions = await Question.find(query);
     callback(null, { questions });
   } catch (err) {
     console.error("Database Error:", err);
     callback({
       code: grpc.status.INTERNAL,
-      message: "Failed to fetch questions",
+      message: "Database error",
     });
   }
 }

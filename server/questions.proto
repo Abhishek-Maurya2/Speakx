@@ -1,10 +1,9 @@
-
 syntax = "proto3";
 
 package questions;
 
 service QuestionsService {
-  rpc GetQuestions(Empty) returns (QuestionsReply);
+  rpc getQuestions(Empty) returns (QuestionsReply);
 }
 
 message Empty {}
@@ -13,8 +12,24 @@ message Question {
   string _id = 1;
   string title = 2;
   string type = 3;
+  string siblingId = 4;
+  string anagramType = 5;
+  repeated Block blocks = 6;
+  repeated string solutions = 7;
+  repeated Option options = 8;
 }
 
 message QuestionsReply {
   repeated Question questions = 1;
+}
+
+message Block {
+  string text = 1;
+  bool showInOption = 2;
+  bool isAnswer = 3;
+}
+
+message Option {
+  string text = 1;
+  bool isCorrect = 2;
 }
