@@ -1,11 +1,10 @@
-import React from 'react';
-import SearchPage from './components/SearchPage';
+import React from "react";
+import SearchPage from "./components/searchPage";
 
 function App() {
-
   return (
     <>
-    <SearchPage />
+      <SearchPage />
     </>
   );
 }
