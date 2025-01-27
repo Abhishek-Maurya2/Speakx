@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { Search, Loader2, Circle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -11,17 +11,93 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { search } from "../handler/apiHandler";
 
-const baseURL = import.meta.env.VITE_API_URL;
+export const AnagramCard = ({ result }) => {
+  const [shuffledBlocks, setShuffledBlocks] = useState([]);
+  const [revealAnswer, setRevealAnswer] = useState(false);
 
-const search = async (data) => {
-  try {
-    const response = await axios.post(`${baseURL}/search/`, data);
-    return response.data;
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
+  useEffect(() => {
+    if (result.blocks) {
+      setShuffledBlocks(shuffleArray(result.blocks));
+    }
+  }, [result.blocks]);
+
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  return (
+    <CardContent>
+      <div className="flex flex-wrap gap-2 mb-2">
+        {shuffledBlocks.map((block, index) => (
+          <div
+            key={index}
+            className="bg-gray-100 px-3 py-1.5 rounded-md hover:bg-gray-200 transition-colors select-none"
+          >
+            {block.text}
+          </div>
+        ))}
+      </div>
+      <Button
+        onClick={() => setRevealAnswer(!revealAnswer)}
+        variant="outline"
+        className="w-full mt-4"
+      >
+        {revealAnswer ? "Hide" : "Reveal"} Answer
+      </Button>
+      {revealAnswer && (
+        <>
+          <p className="text-sm text-gray-500 my-2">Solution</p>
+          <div className="flex flex-wrap gap-1">
+            {result.blocks?.map((block, index) => (
+              <div
+                key={index}
+                className="bg-gray-100 px-2 py-1.5 rounded-md hover:bg-gray-200 transition-colors select-none"
+              >
+                {block.text}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
+    </CardContent>
+  );
+};
+
+export const MCQCard = ({ options }) => {
+  return (
+    <CardContent>
+      {options?.length > 0 ? (
+        <ul
+          role="list"
+          className="space-y-2"
+          aria-label="Multiple choice options"
+        >
+          {options.map((option, index) => (
+            <li
+              key={option.id || index}
+              className="flex items-start gap-2 py-1"
+            >
+              <Circle
+                className={`${
+                  option.isCorrectAnswer ? "text-green-500" : "text-red-500"
+                } h-2.5 w-2.5 flex-shrink-0 mt-1.5`}
+              />
+              <span className="text-sm">{option.text}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p className="text-sm text-gray-500">No options available</p>
+      )}
+    </CardContent>
+  );
 };
 
 function SearchPage() {
@@ -107,8 +183,9 @@ function SearchPage() {
             <SelectContent>
               <SelectItem value="All">All</SelectItem>
               <SelectItem value="MCQ">MCQ</SelectItem>
-              <SelectItem value="ANAGRAM">ANAGRAM</SelectItem>
-              <SelectItem value="READ_ALONG">READ ALONG</SelectItem>
+              <SelectItem value="ANAGRAM">Anagram</SelectItem>
+              <SelectItem value="READ_ALONG">Read Along</SelectItem>
+              <SelectItem value="CONTENT_ONLY">Content Only</SelectItem>
             </SelectContent>
           </Select>
           {parameters.type === "ANAGRAM" && (
@@ -145,41 +222,27 @@ function SearchPage() {
                   (
                     <Card key={result._id}>
                       <CardHeader>
-                        <CardTitle>{result.title}</CardTitle>
+                        <CardTitle className="text-md font-semibold">
+                          {result.title}
+                        </CardTitle>
                       </CardHeader>
-                      <CardContent className="flex justify-between items-center">
-                        <p className="bg-red-500 rounded px-2">{result.type}</p>
+                      <CardContent className="flex gap-4 items-center">
+                        <p className="bg-red-500 rounded px-2 text-sm">
+                          {result.type}
+                        </p>
+                        {result.type === "ANAGRAM" && (
+                          <p className="bg-[#efa03f] rounded px-2 text-sm">
+                            {result.anagramType}
+                          </p>
+                        )}
                       </CardContent>
+
                       {result.type === "MCQ" && (
-                        <CardContent>
-                          {result.options?.length > 0 ? (
-                            <ul
-                              role="list"
-                              className="space-y-2"
-                              aria-label="Multiple choice options"
-                            >
-                              {result.options.map((option, index) => (
-                                <li
-                                  key={option.id || index}
-                                  className="flex items-start gap-2 py-1"
-                                >
-                                  <Circle
-                                    className={`${
-                                      option.isCorrectAnswer
-                                        ? "text-green-500"
-                                        : "text-red-500"
-                                    } h-2.5 w-2.5 flex-shrink-0 mt-1.5`}
-                                  />
-                                  <span className="text-sm">{option.text}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p className="text-sm text-gray-500">
-                              No options available
-                            </p>
-                          )}
-                        </CardContent>
+                        <MCQCard options={result.options} />
+                      )}
+
+                      {result.type === "ANAGRAM" && (
+                        <AnagramCard result={result} />
                       )}
                     </Card>
                   )

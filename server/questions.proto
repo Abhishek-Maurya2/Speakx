@@ -15,7 +15,7 @@ message Question {
   string siblingId = 4;
   string anagramType = 5;
   repeated Block blocks = 6;
-  repeated string solutions = 7;
+  repeated Solution solutions = 7;  // Changed from repeated string
   repeated Option options = 8;
 }
 
@@ -32,4 +32,9 @@ message Block {
 message Option {
   string text = 1;
   bool isCorrectAnswer = 2;
+}
+
+// New message type for solutions
+message Solution {
+  string text = 1;
 }

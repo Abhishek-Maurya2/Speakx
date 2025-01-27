@@ -46,7 +46,11 @@ const questionSchema = new mongoose.Schema({
     },
   },
   solutions: {
-    type: [String],
+    type: [
+      {
+        text: String,
+      },
+    ], // Changed from String to [String]
     required: function () {
       return this.type === "ANAGRAM";
     },
