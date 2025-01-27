@@ -1,4 +1,5 @@
-// Add this at the very top of your index.js
+require("dotenv").config();
+// Add this at the very top of your index.j
 process.env.NODE_NO_WARNINGS = "1";
 
 const express = require("express");
