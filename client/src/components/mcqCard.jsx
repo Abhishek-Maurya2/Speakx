@@ -1,33 +1,23 @@
 import React from "react";
 import { Circle } from "lucide-react";
-import { CardContent } from "@/components/ui/card";
 
-export const MCQCard = ({ options }) => {
+export const MCQResult = ({ options }) => {
   return (
-    <CardContent>
+    <div className="space-y-2">
       {options?.length > 0 ? (
-        <ul
-          role="list"
-          className="space-y-2"
-          aria-label="Multiple choice options"
-        >
-          {options.map((option, index) => (
-            <li
-              key={option.id || index}
-              className="flex items-start gap-2 py-1"
-            >
-              <Circle
-                className={`${
-                  option.isCorrectAnswer ? "text-green-500" : "text-red-500"
-                } h-2.5 w-2.5 flex-shrink-0 mt-1.5`}
-              />
-              <span className="text-sm">{option.text}</span>
-            </li>
-          ))}
-        </ul>
+        options.map((option, index) => (
+          <div key={option.id || index} className="flex items-start gap-3 py-1">
+            <Circle
+              className={`${
+                option.isCorrectAnswer ? "text-green-500" : "text-red-500"
+              } h-2 w-2 mt-2`}
+            />
+            <span className="text-sm">{option.text}</span>
+          </div>
+        ))
       ) : (
-        <p className="text-sm text-gray-500">No options available</p>
+        <p className="text-sm text-muted-foreground">No options available</p>
       )}
-    </CardContent>
+    </div>
   );
 };

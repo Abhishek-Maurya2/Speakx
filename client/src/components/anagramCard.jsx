@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
-
-export const AnagramCard = ({ result }) => {
+export const AnagramResult = ({ result }) => {
   const [shuffledBlocks, setShuffledBlocks] = useState([]);
   const [revealAnswer, setRevealAnswer] = useState(false);
 
@@ -23,39 +22,39 @@ export const AnagramCard = ({ result }) => {
   };
 
   return (
-    <CardContent>
-      <div className="flex flex-wrap gap-2 mb-2">
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-2">
         {shuffledBlocks.map((block, index) => (
-          <div
-            key={index}
-            className="bg-gray-100 px-3 py-1.5 rounded-md hover:bg-gray-200 transition-colors select-none"
-          >
+          <Badge key={index} variant="secondary" className="text-sm py-1 px-2.5">
             {block.text}
-          </div>
+          </Badge>
         ))}
       </div>
       <Button
         onClick={() => setRevealAnswer(!revealAnswer)}
         variant="outline"
-        className="w-full mt-4"
+        className="w-full"
       >
         {revealAnswer ? "Hide" : "Reveal"} Answer
       </Button>
       {revealAnswer && (
-        <>
-          <p className="text-sm text-gray-500 my-2">Solution</p>
-          <div className="flex flex-wrap gap-1">
+        <div className="mt-4">
+          <p className="text-sm font-medium text-muted-foreground mb-2">
+            Solution
+          </p>
+          <div className="flex flex-wrap gap-2">
             {result.blocks?.map((block, index) => (
-              <div
+              <Badge
                 key={index}
-                className="bg-gray-100 px-2 py-1.5 rounded-md hover:bg-gray-200 transition-colors select-none"
+                variant="default"
+                className="text-sm py-1 px-2"
               >
                 {block.text}
-              </div>
+              </Badge>
             ))}
           </div>
-        </>
+        </div>
       )}
-    </CardContent>
+    </div>
   );
 };
