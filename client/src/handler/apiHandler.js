@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const baseURL =
-  import.meta.env.VITE_API_URL || "http://13.235.80.188/questions";
+  import.meta.env.VITE_API_URL;
 
 export const search = async (data) => {
   try {
