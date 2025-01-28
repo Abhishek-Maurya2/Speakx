@@ -43,3 +43,5 @@ app.listen(PORT, async () => {
     process.exit(1);
   }
 });
+
+module.exports = app;
